@@ -26,6 +26,7 @@ jobs:
 
       - name: Install Qt 6 WebAssembly
         run: |
+          ~/.local/bin/aqt list-qt linux desktop
           ~/.local/bin/aqt install-qt \
             linux desktop 6.8.3 wasm_singlethread \
             -O "$HOME/Qt"
