@@ -35,7 +35,7 @@ jobs:
         run: |
           ~/.local/bin/aqt install-qt \
             all_os wasm 6.12.0 \
-            wasm_multithread \
+            wasm_singlethread \
             -O "$HOME/Qt"
 
       - name: Install Emscripten
@@ -55,7 +55,7 @@ jobs:
           cmake -S . -B build-wasm \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE="$HOME/Qt/6.12.0/wasm_multithread/lib/cmake/Qt6/qt.toolchain.cmake" \
+            -DCMAKE_TOOLCHAIN_FILE="$HOME/Qt/6.12.0/wasm_singlethread/lib/cmake/Qt6/qt.toolchain.cmake" \
             -DQT_CHAINLOAD_TOOLCHAIN_FILE="$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake" \
             -DQT_HOST_PATH="$HOME/Qt/6.12.0/gcc_64"
 
