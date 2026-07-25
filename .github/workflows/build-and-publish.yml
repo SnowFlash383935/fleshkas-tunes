@@ -26,7 +26,7 @@ jobs:
 
       - name: List Qt 6.8.3 architectures
         run: |
-          ~/.local/bin/aqt list-qt linux desktop 6.8.3 --arch
+          ~/.local/bin/aqt list-qt linux desktop --arch 6.8.3
           
       - name: Install Qt desktop
         run: |
