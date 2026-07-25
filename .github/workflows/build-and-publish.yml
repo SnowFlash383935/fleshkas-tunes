@@ -63,18 +63,25 @@ jobs:
         run: |
           cmake --build build-wasm --parallel
 
-      - name: Prepare web preview
+      - name: Prepare WebAssembly preview
         run: |
           mkdir -p out
-          ls build-wasm
-
-          cp build-wasm/FleshkasTunes.html out/index.html
-          cp build-wasm/FleshkasTunes.js out/
-          cp build-wasm/FleshkasTunes.wasm out/
-
-          if [ -f build-wasm/FleshkasTunes.data ]; then
-            cp build-wasm/FleshkasTunes.data out/
-          fi
+          rsync -a \
+            --exclude='CMakeCache.txt' \
+            --exclude='CMakeFiles/' \
+            --exclude='FleshkasTunes_autogen/' \
+            --exclude='build.ninja' \
+            --exclude='cmake_install.cmake' \
+            --exclude='*.cpp' \
+            --exclude='*.h' \
+            --exclude='*.hpp' \
+            --exclude='*.qmake' \
+            --exclude='*.cmake' \
+            --exclude='meta_types/' \
+            --exclude='qmltypes/' \
+            build-wasm/ out/
+          mv out/FleshkasTunes.html out/index.html
+          ls out/
           
       - name: Upload WebAssembly preview
         uses: mmkal/artifact.ci/upload@main
