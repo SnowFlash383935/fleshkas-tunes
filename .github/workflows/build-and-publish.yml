@@ -66,6 +66,7 @@ jobs:
       - name: Prepare web preview
         run: |
           mkdir -p out
+          ls build-wasm
 
           cp build-wasm/FleshkasTunes.html out/index.html
           cp build-wasm/FleshkasTunes.js out/
