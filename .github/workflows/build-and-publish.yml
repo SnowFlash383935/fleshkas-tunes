@@ -23,7 +23,14 @@ jobs:
       - name: Install aqtinstall
         run: |
           python3 -m pip install --user aqtinstall
-
+          
+      - name: Install Qt desktop
+        run: |
+          ~/.local/bin/aqt install-qt \
+            linux desktop 6.12.0 \
+            linux_gcc_64 \
+            -O "$HOME/Qt"
+            
       - name: Install Qt WebAssembly
         run: |
           ~/.local/bin/aqt install-qt \
@@ -49,7 +56,8 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$HOME/Qt/6.12.0/wasm_multithread/lib/cmake/Qt6/qt.toolchain.cmake" \
-            -DQT_CHAINLOAD_TOOLCHAIN_FILE="$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+            -DQT_CHAINLOAD_TOOLCHAIN_FILE="$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake" \
+            -DQT_HOST_PATH="$HOME/Qt/6.12.0/gcc_64"
 
       - name: Build WebAssembly application
         run: |
