@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -7,19 +8,37 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    const QUrl url(u"qrc:/io.fleshka.tunes/qml/Main.qml"_qs);
-
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
         &app,
         []() {
+            qCritical() << "QML object creation failed!";
             QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection
     );
 
-    engine.load(url);
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::warnings,
+        [](const QList<QQmlError> &warnings) {
+            for (const auto &warning : warnings) {
+                qWarning().noquote() << warning.toString();
+            }
+        }
+    );
+
+    engine.load(
+        QUrl(QStringLiteral(
+            "qrc:/qt/qml/io/fleshka/tunes/qml/Main.qml"
+        ))
+    );
+
+    if (engine.rootObjects().isEmpty()) {
+        qCritical() << "No root QML objects were created!";
+        return -1;
+    }
 
     return app.exec();
 }
