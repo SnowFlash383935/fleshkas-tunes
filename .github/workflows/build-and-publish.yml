@@ -24,6 +24,10 @@ jobs:
         run: |
           python3 -m pip install --user aqtinstall
 
+      - name: List Qt 6.8.3 architectures
+        run: |
+          ~/.local/bin/aqt list-qt linux desktop 6.8.3 --arch
+          
       - name: Install Qt desktop
         run: |
           ~/.local/bin/aqt install-qt \
