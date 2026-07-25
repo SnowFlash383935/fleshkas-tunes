@@ -23,10 +23,6 @@ jobs:
       - name: Install aqtinstall
         run: |
           python3 -m pip install --user aqtinstall
-
-      - name: List Qt 6.8.3 architectures
-        run: |
-          ~/.local/bin/aqt list-qt linux desktop --arch 6.8.3
           
       - name: Install Qt desktop
         run: |
@@ -39,7 +35,7 @@ jobs:
         run: |
           ~/.local/bin/aqt install-qt \
             linux desktop 6.8.3 \
-            wasm_singlethread \
+            wasm_multithread \
             -O "$HOME/Qt"
 
       - name: Add Qt to PATH
