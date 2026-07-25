@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     );
 
     engine.loadFromModule("io.fleshka.tunes", "Main");
-
+    if (engine.rootObjects().isEmpty())
+        return -1;
     return app.exec();
 }
