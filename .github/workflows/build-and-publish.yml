@@ -1,104 +1,59 @@
-name: Build Fleshka's Tunes and publish preview
+name: Build Fleshka's Tunes for WebAssembly
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  build-wasm:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Qt 6 and build tools
+      - name: Install build tools
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
+            python3-pip \
             cmake \
-            ninja-build \
-            g++ \
-            qt6-base-dev \
-            qt6-declarative-dev \
-            qt6-tools-dev \
-            qt6-tools-dev-tools
+            ninja-build
 
-      - name: Cache CMake build
-        uses: actions/cache@v4
-        with:
-          path: build
-          key: build-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'src/**', 'qml/**') }}
-          restore-keys: |
-            build-${{ runner.os }}-
-
-      - name: Configure build
+      - name: Install aqtinstall
         run: |
-          cmake -S . -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release
+          python3 -m pip install --user aqtinstall
 
-      - name: Build
+      - name: Install Qt 6 WebAssembly
         run: |
-          cmake --build build --parallel
+          ~/.local/bin/aqt install-qt \
+            linux desktop 6.8.3 wasm_singlethread \
+            -O "$HOME/Qt"
 
-      - name: Run app once
+      - name: Add Qt to PATH
         run: |
-          QT_QPA_PLATFORM=offscreen ./build/FleshkasTunes || true
+          echo "$HOME/Qt/6.8.3/wasm_singlethread/bin" >> "$GITHUB_PATH"
 
-      - name: Build preview page
+      - name: Configure WebAssembly build
+        run: |
+          cmake -S . -B build-wasm \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$HOME/Qt/6.8.3/wasm_singlethread/lib/cmake/Qt6/qt.toolchain.cmake"
+
+      - name: Build WebAssembly application
+        run: |
+          cmake --build build-wasm --parallel
+
+      - name: Prepare web preview
         run: |
           mkdir -p out
-          cat > out/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Fleshka's Tunes</title>
-            <style>
-              body {
-                font-family: system-ui, sans-serif;
-                max-width: 900px;
-                margin: 3rem auto;
-                padding: 0 1rem;
-              }
-              .frame {
-                border: 1px solid #ccc;
-                border-radius: 18px;
-                padding: 24px;
-              }
-              h1 {
-                margin-top: 0;
-                font-size: 2.4rem;
-              }
-              .mock {
-                margin-top: 24px;
-                border: 1px solid #999;
-                border-radius: 18px;
-                min-height: 360px;
-                display: grid;
-                place-items: center;
-                font-size: 2rem;
-              }
-              code {
-                background: #f4f4f4;
-                padding: 0.15rem 0.35rem;
-                border-radius: 6px;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="frame">
-              <h1>Fleshka's Tunes</h1>
-              <p>Qt 6 + QML hello world preview.</p>
-              <p>App ID: <code>io.fleshka.tunes</code></p>
-              <div class="mock">QML preview goes here</div>
-            </div>
-          </body>
-          </html>
-          HTML
 
-      - name: Upload preview
+          cp build-wasm/* out
+          mv out/FleshkasTunes.html out/index.html
+    
+
+      - name: Upload WebAssembly preview
         uses: mmkal/artifact.ci/upload@main
         with:
           path: out
