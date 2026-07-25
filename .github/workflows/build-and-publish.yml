@@ -67,10 +67,14 @@ jobs:
         run: |
           mkdir -p out
 
-          cp build-wasm/* out
-          mv out/FleshkasTunes.html out/index.html
-    
+          cp build-wasm/FleshkasTunes.html out/index.html
+          cp build-wasm/FleshkasTunes.js out/
+          cp build-wasm/FleshkasTunes.wasm out/
 
+          if [ -f build-wasm/FleshkasTunes.data ]; then
+            cp build-wasm/FleshkasTunes.data out/
+          fi
+          
       - name: Upload WebAssembly preview
         uses: mmkal/artifact.ci/upload@main
         with:
