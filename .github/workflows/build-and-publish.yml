@@ -41,7 +41,7 @@ jobs:
       - name: Install Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: 4.0.7
+          version: 5.0.5
 
       - name: Verify WebAssembly toolchain
         run: |
